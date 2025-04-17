@@ -1,21 +1,44 @@
 import pickle
+import json
+import numpy as np
 
 # Load the trained model
 with open('model/home_prices_model.pickle', 'rb') as f:
     model = pickle.load(f)
 
-# Function to predict price based on user input
-def predict_price(area, bedrooms, bathrooms):
-    input_features = [[area, bedrooms, bathrooms]]
-    predicted_price = model.predict(input_features)
-    return predicted_price[0]
+# Load column names
+with open('model/columns.json', 'r') as f:
+    data_columns = json.load(f)['data_columns']
 
-# Take user input
-area = float(input("Enter area in sqft: "))
-bedrooms = int(input("Enter number of bedrooms: "))
-bathrooms = int(input("Enter number of bathrooms: "))
+# Function to predict price
+def predict_price(location, sqft, bath, bhk):
+    # Get the index of the location column
+    loc_index = np.where(data_columns == location)[0][0]  # Use loaded column names
+    x = np.zeros(len(data_columns))  # Create an array of zeros for features
+    
+    # Assign values to respective positions in the feature array
+    x[0] = sqft  # Area (sqft)
+    x[1] = bath   # Number of bathrooms
+    x[2] = bhk    # Number of bedrooms
+    
+    # Set the location column to 1 if the location is specified
+    if loc_index >= 0:
+        x[loc_index] = 1
 
-# Predict price
-predicted_price = predict_price(area, bedrooms, bathrooms)
-print(f"Estimated House Price: ₹{predicted_price:,.2f}")
+    # Predict and return the price
+    return model.predict([x])[0]
+
+# Take user inputs
+print("Welcome to the House Price Prediction!")
+location = input("Enter the location: ")  # User input for location
+sqft = float(input("Enter the area in sqft: "))  # User input for area
+bath = int(input("Enter number of bathrooms: "))  # User input for bathrooms
+bhk = int(input("Enter number of bedrooms: "))  # User input for bedrooms
+
+# Predict the price based on user input
+predicted_price = predict_price(location, sqft, bath, bhk)
+
+# Print the predicted price
+print(f"Predicted House Price: ₹{predicted_price:,.2f}")
+
 
