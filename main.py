@@ -1,26 +1,21 @@
 import pickle
-import json
-import numpy as np
 
-# Load model
-with open("model/home_prices_model.pickle", "rb") as f:
+# Load the trained model
+with open('model/price_model.pkl', 'rb') as f:
     model = pickle.load(f)
 
-# Load columns
-with open("model/columns.json", "r") as f:
-    data_columns = json.load(f)['data_columns']
+# Take user input
+area = float(input("Enter area in sqft: "))
+bedrooms = int(input("Enter number of bedrooms: "))
+bathrooms = int(input("Enter number of bathrooms: "))
 
-# Sample input — replace with your own values
-def predict_price(area, bhk, bath, location):
-    x = np.zeros(len(data_columns))
-    x[0] = area
-    x[1] = bath
-    x[2] = bhk
-    try:
-        loc_index = data_columns.index(location.lower())
-        x[loc_index] = 1
-    except:
-        pass
+# Create input array (adjust this based on your model's expected input)
+input_features = [[area, bedrooms, bathrooms]]
+
+# Predict
+predicted_price = model.predict(input_features)
+
+print(f"Estimated House Price: ₹{predicted_price[0]:,.2f}")
 
     return model.predict([x])[0]
 
