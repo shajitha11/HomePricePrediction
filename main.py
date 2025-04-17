@@ -12,8 +12,17 @@ with open('model/columns.json', 'r') as f:
 
 # Function to predict price
 def predict_price(location, sqft, bath, bhk):
+    # Convert both the location and columns to lowercase for case-insensitive matching
+    location = location.lower()
+    
+    # Check if location exists in the columns
+    if location not in data_columns:
+        print(f"Error: The location '{location}' is not available in the model.")
+        return None
+    
     # Get the index of the location column
-    loc_index = np.where(data_columns == location)[0][0]  # Use loaded column names
+    loc_index = data_columns.index(location)
+    
     x = np.zeros(len(data_columns))  # Create an array of zeros for features
     
     # Assign values to respective positions in the feature array
@@ -22,8 +31,7 @@ def predict_price(location, sqft, bath, bhk):
     x[2] = bhk    # Number of bedrooms
     
     # Set the location column to 1 if the location is specified
-    if loc_index >= 0:
-        x[loc_index] = 1
+    x[loc_index] = 1
 
     # Predict and return the price
     return model.predict([x])[0]
@@ -39,6 +47,7 @@ bhk = int(input("Enter number of bedrooms: "))  # User input for bedrooms
 predicted_price = predict_price(location, sqft, bath, bhk)
 
 # Print the predicted price
-print(f"Predicted House Price: ₹{predicted_price:,.2f}")
+if predicted_price is not None:
+    print(f"Predicted House Price: ₹{predicted_price:,.2f}")
 
 
