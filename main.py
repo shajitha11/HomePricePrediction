@@ -1,8 +1,9 @@
 import pickle
 
 # Load the trained model
-with open('model/price_model.pkl', 'rb') as f:
+with open('model/home_prices_model.pickle', 'rb') as f:
     model = pickle.load(f)
+   
 
 # Take user input
 area = float(input("Enter area in sqft: "))
